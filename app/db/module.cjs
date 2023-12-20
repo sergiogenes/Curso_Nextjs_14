@@ -21,6 +21,9 @@ const pool = new Pool({
   connectionTimeoutMillis: 10000,
 });
 
-const client = await pool.connect();
+async function connectToDatabase() {
+  const client = await pool.connect();
+  return client;
+}
 
-module.exports = { client };
+module.exports = { connectToDatabase };

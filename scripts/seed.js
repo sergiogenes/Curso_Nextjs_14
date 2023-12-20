@@ -1,5 +1,7 @@
 //const { db } = require('@vercel/postgres');
 const { client } = require('../app/db/module.cjs');
+const { connectToDatabase } = require('../app/db/module.cjs');
+
 const {
   invoices,
   customers,
@@ -174,23 +176,21 @@ async function seedRevenue(client) {
 }
 
 async function main() {
-  await client.connect();
-
-  await client.query('DELETE FROM users');
-  await client.query('DELETE FROM customers');
-  await client.query('DELETE FROM invoices');
-  await client.query('DELETE FROM revenue');
+  const client = await connectToDatabase();
+  await client.query('DROP TABLE IF EXISTS users');
+  await client.query('DROP TABLE IF EXISTS customers');
+  await client.query('DROP TABLE IF EXISTS invoices');
+  await client.query('DROP TABLE IF EXISTS revenue');
 
   await seedUsers(client);
   await seedCustomers(client);
   await seedInvoices(client);
   await seedRevenue(client);
-
-  await client.end();
+  client.end();
 }
 
 main().catch(async (err) => {
-  await client.end();
+  client.end();
   console.error(
     'An error occurred while attempting to seed the database:',
     err,
